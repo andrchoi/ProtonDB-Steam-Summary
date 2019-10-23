@@ -1,22 +1,23 @@
 {
     "manifest_version": 2,
     "name": "ProtonDB Ratings on Steam",
+    "author": "choiandr",
     "version": "1.0",
   
     "description": "Shows details from ProtonDB ratings on steam store pages.",
   
     "content_scripts": [
       {
-        "matches": ["*://*.store.steampowered.com/app/*"],
-        "js": ["src/protonData.js", "src/appPage.js"]
+        "matches": [
+          "https://*.store.steampowered.com/app/*"
+      ],
+        "js": ["src/protonData.js", "src/unofficialAPI.js", "src/appPage.js"]
       }
     ],
 
     "permissions" : [
-        "https://protondb.max-p.me/games/*",
-        "https://www.protondb.com/*",
-        "*://*.store.steampowered.com/app/*",
-        "storage"
+      "storage",
+      "https://www.protondb.com/*",
+      "https://protondb.max-p.me/*"
     ]
-  
   }

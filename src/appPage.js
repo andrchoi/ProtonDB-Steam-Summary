@@ -28,8 +28,7 @@ function handleReports(res) {
 function updateReports(reports) {
     let reportsBlock = document.getElementById(REPORTSID);
 
-    let fixes = getReportedFixes(reports)
-    console.log(fixes);
+    let fixes = getReportedFixes(reports);
     if (fixes.length > 0) {
         let fixesBlock = document.createElement('div');
         let title = document.createElement('span');
@@ -57,9 +56,6 @@ function updateReports(reports) {
         configLink.target = '_blank';
         configLink.innerText = 'Click here for more config information.';
         cfgLinkContainer.appendChild(configLink);
-
-        let lineBreak = document.createElement('br');
-        reportsBlock.appendChild(lineBreak);
     }
 
     let totalCount = document.createTextNode('Based on '+reports.length+' total reports.')
@@ -67,7 +63,6 @@ function updateReports(reports) {
 }
 
 function updateSummary(summary) {
-    console.log(summary)
     let summaryBlock = document.getElementById(SUMMARYID);
     summaryBlock.firstChild.remove();
 
