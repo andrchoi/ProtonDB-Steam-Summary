@@ -7,22 +7,49 @@ const METABLOCKID = 'PDBRSAddon_info';
 let summary;
 let reports;
 
-let appID = getSteamAppID();
+let isNative = false;
 
-function handleSummary(res) {
-    if (summary !== null) {
-        summary = res;
-    }
-    updateSummary(summary);
-    
+
+function getSteamAppID() {
+    let currentURL = window.location.href;
+    let splitURL = currentURL.split('/');
+    let appID = splitURL[splitURL.indexOf('app')+1];
+
+    return parseInt(appID);
 }
 
-function handleReports(res) {
-    reports = res;
-    if (reports === {}) {
-        summary = null
-    }
-    updateReports(reports);
+function handleSummary(appID) {
+    let protonURL = 'https://www.protondb.com/';
+    let protonAPI = 'api/v1/reports/summaries/';
+
+    let url = protonURL+protonAPI+appID+'.json';
+    fetch(url).then(
+        res => res.json()).then(function(res) {
+            summary = res;
+        }
+    ).catch(function(error) {
+        console.log(error);
+        summary = {}
+    }).finally(function () {
+        console.log(summary);
+        updateSummary(summary);
+    })    
+}
+
+function handleReports(appID) {
+    let reportURL = 'https://protondb.max-p.me/games/';
+    let url = reportURL+appID+'/reports';
+
+    fetch(url).then(
+        res => res.json()).then(function(res) {
+            reports = res;
+        }
+    ).catch(function (error) {
+        console.log(error);
+    }).finally(function () {
+        console.log(reports);
+        updateReports(reports);
+    })
 }
 
 function updateReports(reports) {
@@ -31,8 +58,8 @@ function updateReports(reports) {
     let fixes = getReportedFixes(reports);
     if (fixes.length > 0) {
         let fixesBlock = document.createElement('div');
-        let title = document.createElement('span');
-        title.innerText = 'Recommended Fixes: ';
+        let title = document.createElement('b');
+        title.innerText = 'Recommended Tweaks: ';
         fixesBlock.appendChild(title);
 
         let firstInList = true;
@@ -43,23 +70,34 @@ function updateReports(reports) {
             }
             firstInList = false;
             fixText.innerText += fix.name;
+            fixText.setAttribute('title', 'Mentioned in '+fix.count+' reports');
 
             fixesBlock.appendChild(fixText);
         })
         reportsBlock.appendChild(fixesBlock)
+    }
 
+    if (!isNative){
+        let totalCount = document.createTextNode('Based on '+reports.length+' total reports.')
+        reportsBlock.appendChild(totalCount);
+    }
+
+    let lineBreak = document.createElement('br');
+    reportsBlock.appendChild(lineBreak);
+    lineBreak = document.createElement('br');
+    reportsBlock.appendChild(lineBreak);
+
+    if (fixes.length > 0) {
         let cfgLinkContainer = document.createElement('div');
         reportsBlock.appendChild(cfgLinkContainer);
 
         let configLink = document.createElement('a');
+        configLink.setAttribute('class', 'linkbar');
         configLink.href = 'https://github.com/ValveSoftware/Proton#runtime-config-options';
         configLink.target = '_blank';
         configLink.innerText = 'Click here for more config information.';
         cfgLinkContainer.appendChild(configLink);
     }
-
-    let totalCount = document.createTextNode('Based on '+reports.length+' total reports.')
-    reportsBlock.appendChild(totalCount);
 }
 
 function updateSummary(summary) {
@@ -70,26 +108,35 @@ function updateSummary(summary) {
     
     let lineBreak = document.createElement('br');
     let overallTier = document.createElement('b');
+    overallTier.innerText = 'Overall Tier: ';
     summaryBlock.appendChild(overallTier);
 
-    if (summary.tier !== 'pending') {
-        overallTier.innerText = 'Overall Tier: ';
-        tierInfo = getTierInfo(summary.tier);
-        summaryBlock.appendChild(tierInfo);
+    if (Object.keys(summary).length > 0) {
+        if (summary.tier !== 'pending') {
+            tierInfo = getTierInfo(summary.tier);
+            summaryBlock.appendChild(tierInfo);
 
-        summaryBlock.appendChild(lineBreak);
+            summaryBlock.appendChild(lineBreak);
 
-        let recentTier = document.createElement('b');
-        recentTier.innerText = 'Trending Tier: ';
-        summaryBlock.appendChild(recentTier);
+            let recentTier = document.createElement('b');
+            recentTier.innerText = 'Trending Tier: ';
+            summaryBlock.appendChild(recentTier);
 
-        tierInfo = getTierInfo(summary.trendingTier);
-        summaryBlock.appendChild(tierInfo);
+            tierInfo = getTierInfo(summary.trendingTier);
+            summaryBlock.appendChild(tierInfo);
+        } else {
+            overallTier.innerText = 'Provisional Tier: ';
+
+            tierInfo = getTierInfo(summary.provisionalTier);
+            summaryBlock.appendChild(tierInfo);
+        }
     } else {
-        overallTier.innerText = 'Provisional Tier (Needs Reports!): ';
-
-        tierInfo = getTierInfo(summary.provisionalTier);
-        summaryBlock.appendChild(tierInfo);
+        if (isNative){
+            tierInfo = getTierInfo('native');
+            summaryBlock.appendChild(tierInfo);
+        } else {
+            overallTier.innerText = 'Need reports to generate a score.';
+        }
     }
 
     lineBreak = document.createElement('br');
@@ -139,6 +186,7 @@ function makeProtonInfoBlock() {
     content.appendChild(pdbLink);
 
     let link = document.createElement('a');
+    link.setAttribute('class', 'linkbar');
     link.href = 'https://www.protondb.com/app/'+appID;
     link.target = '_blank';
     link.innerText = 'See more details on ProtonDB.';
@@ -147,8 +195,14 @@ function makeProtonInfoBlock() {
     return element;
 }
 
-getProtonDBSummary(appID);
-getProtonDBReports(appID);
+let appID = getSteamAppID();
+handleSummary(appID);
+handleReports(appID);
+
+let checkforLinux = document.getElementsByClassName('platform_img linux');
+if (checkforLinux.length > 0) {
+    isNative = true;
+}
 
 let infoBlock = makeProtonInfoBlock();
 let container = document.querySelector('.game_meta_data');

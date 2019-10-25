@@ -9,70 +9,57 @@ const TIERS = {
     'BORK': 'borked'
 }
 
-function getSteamAppID() {
-    let currentURL = window.location.href;
-    let splitURL = currentURL.split('/');
-    let appID = splitURL[splitURL.indexOf('app')+1];
-
-    return parseInt(appID);
-}
-
-function getProtonDBSummary(appID) {
-    let protonURL = 'https://www.protondb.com/';
-    let protonAPI = 'api/v1/reports/summaries/';
-
-    fetch(protonURL+protonAPI+appID+'.json').then(
-        res => res.json()).then(function(res) {
-            console.log(res);
-            if (res !== []) {
-                handleSummary(res)
-            } else {
-                handleSummary([]);
-            }
-        }
-    ).catch(function(error) {
-        console.log(error);
-    })    
-}
-
-function test() {
-
-    console.log(error)
-}
-function handleXHR() {
-    handleSummary(JSON(this.responseText));
+const COLORS = {
+    'NATIVE': 'green',
+    'PLAT': 'platinum',
+    'GOLD': 'gold',
+    'SILVER': 'silver',
+    'BRONZE': 'bronze',
+    'BORK': 'red'
 }
 
 function getTierInfo(tier) {
     let info = {
         'title': getFormattedTier(tier),
-        'description': null 
+        'description': null, 
+        'color': 'default'
     }
     if (tier === TIERS.NATIVE){
         info.description = 'Runs natively on Linux. Hooray!';
+        info.color = 'green';
     }
     else if (tier === TIERS.PLAT){
-        info.description = 'Runs as well as Windows without changes.';
+        info.description = 'Runs perfectly out of the box.';
+        info.color = '#b4c7dc';
     }
     else if (tier === TIERS.GOLD){
-        info.description = 'Runs as well as Windows after minor fixes.';
+        info.description = 'Runs perfectly after tweaks.';
+        info.color = '#cfb53b';
     }
     else if (tier === TIERS.SILVER){
-        info.description = 'Runs after tweaks and/or minor issues.';
+        info.description = 'Runs with minor issues, but generally is playable.';
+        info.color = 'silver';
     }
     else if (tier === TIERS.BRONZE){
-        info.description = 'Runs with tweaks but has crashes and/or major issues.';
+        info.description = 'Runs, but often crashes or has issues preventing from playing comfortably.';
+        info.color = '#cd7f32';
     }
     else if (tier === TIERS.BORK){
-        info.description = 'Unplayable issues or will not start.';
+        info.description = 'Game either won’t start or is crucially unplayable.';
+        info.color = 'red';
     } 
     else {
         info.description = 'Not enough reports to generate a score.';
     }
 
+    let padding = '1em';
     let textBlock = document.createElement('span');
     textBlock.innerText = info.title;
     textBlock.setAttribute('title', info.description);
+    textBlock.style.backgroundColor = info.color;
+    textBlock.style.paddingLeft = padding;
+    textBlock.style.paddingRight = padding;
+    textBlock.style.color = 'black';
     return textBlock;
 }
 
@@ -82,5 +69,5 @@ function getFormattedTier(tier) {
     if (tier){
         ans = tier.charAt(0).toUpperCase() + tier.slice(1);
     }
-    return ans
+    return ans;
 }

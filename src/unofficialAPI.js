@@ -5,10 +5,7 @@ const CONFIG_OPTIONS = [
     'ESYNC',
     'FSYNC',
     'LGADD',
-    'GLSTR' 
-]
-
-const CONFIG_D3D = [
+    'GLSTR',
     'WINED3D',
     'D3D11',
     'D3D10',
@@ -28,11 +25,6 @@ function getProtonDBReports(appID) {
     })
 }
 
-function findWhichD3DIndex(note){
-    //TODO:
-    return 0;
-}
-
 function getReportedFixes(reports) {
     let max = 20;
     if (max > reports.length){
@@ -45,24 +37,18 @@ function getReportedFixes(reports) {
             'count': 0   
         })
     })
-    CONFIG_D3D.forEach( function(option) {
-        list.push({
-            'name': option,
-            'count': 0   
-        })
-    })
 
     for (let i = 0; i < max; i++){
-        let note = reports[i].notes;
-        if (note !== null){
-            note = note.toUpperCase();
-            if (note.indexOf('D3D') !== -1) {
-                list[CONFIG_OPTIONS.length+findWhichD3DIndex(note)].count++;
-            }
-            for (let j = 0; j < CONFIG_OPTIONS.length; j++){
-                let option = CONFIG_OPTIONS[j];
-                if (note.indexOf(option) !== -1) {
-                    list[j].count++;
+        let report = reports[i];
+        if (report.rating !== TIERS.PLAT || report.rating !== TIERS.BORK){
+            let note = report.notes;
+            if (note !== null){
+                note = note.toUpperCase();
+                for (let j = 0; j < CONFIG_OPTIONS.length; j++){
+                    let option = CONFIG_OPTIONS[j];
+                    if (note.indexOf(option) !== -1) {
+                        list[j].count++;
+                    }
                 }
             }
         }
