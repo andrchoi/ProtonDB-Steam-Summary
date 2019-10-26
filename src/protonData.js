@@ -24,29 +24,31 @@ function getTierInfo(tier) {
         'description': null, 
         'color': 'default'
     }
-    if (tier === TIERS.NATIVE){
-        info.description = 'Runs natively on Linux. Hooray!';
-        info.color = 'green';
-    }
-    else if (tier === TIERS.PLAT){
-        info.description = 'Runs perfectly out of the box.';
-        info.color = '#b4c7dc';
-    }
-    else if (tier === TIERS.GOLD){
-        info.description = 'Runs perfectly after tweaks.';
-        info.color = '#cfb53b';
-    }
-    else if (tier === TIERS.SILVER){
-        info.description = 'Runs with minor issues, but generally is playable.';
-        info.color = 'silver';
-    }
-    else if (tier === TIERS.BRONZE){
-        info.description = 'Runs, but often crashes or has issues preventing from playing comfortably.';
-        info.color = '#cd7f32';
-    }
-    else if (tier === TIERS.BORK){
-        info.description = 'Game either won’t start or is crucially unplayable.';
-        info.color = 'red';
+    if (tier){
+        if (tier === TIERS.NATIVE){
+            info.description = 'Runs natively on Linux. Hooray!';
+            info.color = 'green';
+        }
+        else if (tier === TIERS.PLAT){
+            info.description = 'Runs perfectly out of the box.';
+            info.color = '#b4c7dc';
+        }
+        else if (tier === TIERS.GOLD){
+            info.description = 'Runs perfectly after tweaks.';
+            info.color = '#cfb53b';
+        }
+        else if (tier === TIERS.SILVER){
+            info.description = 'Runs with minor issues, but generally is playable.';
+            info.color = 'silver';
+        }
+        else if (tier === TIERS.BRONZE){
+            info.description = 'Runs, but often crashes or has issues preventing from playing comfortably.';
+            info.color = '#cd7f32';
+        }
+        else if (tier === TIERS.BORK){
+            info.description = 'Game either won’t start or is crucially unplayable.';
+            info.color = 'red';
+        }
     } 
     else {
         info.description = 'Not enough reports to generate a score.';
@@ -59,10 +61,11 @@ function getTierInfo(tier) {
     textBlock.style.backgroundColor = info.color;
     textBlock.style.paddingLeft = padding;
     textBlock.style.paddingRight = padding;
-    textBlock.style.color = 'black';
+    if (tier){
+        textBlock.style.color = 'black';
+    }
     return textBlock;
 }
-
 
 function getFormattedTier(tier) {
     let ans = 'N/A';

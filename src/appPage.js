@@ -71,7 +71,7 @@ function updateReports(reports) {
             }
             firstInList = false;
             fixText.innerText += fix.name;
-            fixText.setAttribute('title', 'Mentioned in '+fix.count+' reports');
+            fixText.setAttribute('title', 'Mentioned in '+fix.count+' recent reports');
 
             fixesBlock.appendChild(fixText);
         })
@@ -129,17 +129,17 @@ function updateSummary(summary) {
             newTableRatingRow(tbody, 'Provisional', tierInfo);
         }
 
-        tierTable.appendChild(tbody);
 
     } else {
         if (isNative){
             tierInfo = getTierInfo('native');
-            newTableRatingRow(tbody, 'Overall', tierInfo);
         } else {
-            tierTable = document.createElement('span');
-            rowTitle.innerText = 'Need reports to generate a score.';
+            tierInfo = getTierInfo(false);
+            summary.total = 0;
         }
+        newTableRatingRow(tbody, 'Overall', tierInfo);
     }
+    tierTable.appendChild(tbody);
     summaryBlock.appendChild(tierTable);
     
     if (!isNative){
@@ -222,8 +222,8 @@ function makeProtonInfoBlock() {
 }
 
 function checkForLinux(){
-    let purcaseArea = document.getElementsByClassName('game_area_purchase_game_wrapper')[0];
-    let icon = purcaseArea.getElementsByClassName('platform_img linux');
+    let purchaseArea = document.getElementById('game_area_purchase');
+    let icon = purchaseArea.getElementsByClassName('platform_img linux');
     if (icon.length > 0){
         isNative = true;
     }
