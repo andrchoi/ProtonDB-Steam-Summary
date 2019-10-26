@@ -124,7 +124,7 @@ function updateSummary(summary) {
     
     let tierTable = document.createElement('table');
     tierTable.setAttribute('class', 'game_language_options');
-    tierTable.style.borderCollapse = '';
+    tierTable.style.borderCollapse = 'initial';
     tierTable.style.width = '75%';
     let tbody = document.createElement('tbody');
 
@@ -209,7 +209,7 @@ function makeProtonInfoBlock() {
 }
 
 function checkForLinux(){
-    let purcaseArea = document.getElementsByClassName('game_area_purchase_game_wrapper');
+    let purcaseArea = document.getElementsByClassName('game_area_purchase_game_wrapper')[0];
     let icon = purcaseArea.getElementsByClassName('platform_img linux');
     if (icon.length > 0){
         isNative = true;
