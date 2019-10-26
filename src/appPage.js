@@ -2,6 +2,7 @@
 
 const SUMMARYID = 'PDBRSAddon_summary';
 const REPORTSID = 'PDBRSAddon_reports';
+const COUNTID = 'PDBRSAddon_count';
 const METABLOCKID = 'PDBRSAddon_info';
 
 let summary;
@@ -76,28 +77,6 @@ function updateReports(reports) {
         })
         reportsBlock.appendChild(fixesBlock)
     }
-
-    if (!isNative){
-        let totalCount = document.createTextNode('Based on '+reports.length+' total reports.')
-        reportsBlock.appendChild(totalCount);
-    }
-
-    let lineBreak = document.createElement('br');
-    reportsBlock.appendChild(lineBreak);
-    lineBreak = document.createElement('br');
-    reportsBlock.appendChild(lineBreak);
-
-    if (fixes.length > 0) {
-        let cfgLinkContainer = document.createElement('div');
-        reportsBlock.appendChild(cfgLinkContainer);
-
-        let configLink = document.createElement('a');
-        configLink.setAttribute('class', 'linkbar');
-        configLink.href = 'https://github.com/ValveSoftware/Proton#runtime-config-options';
-        configLink.target = '_blank';
-        configLink.innerText = 'Click here for more config information.';
-        cfgLinkContainer.appendChild(configLink);
-    }
 }
 
 function newTableRatingRow(tbody, desc, tier){
@@ -116,6 +95,15 @@ function newTableRatingRow(tbody, desc, tier){
     row.appendChild(rowRating);
 }
 
+function setReportsCount(count){
+    let countContainer = document.getElementById(COUNTID)[0];
+    let reportsText = document.createElement('span');
+    console.log('test')
+    if (!isNative){
+        reportsText.innerText = 'Based on '+count+' total reports.';
+        countContainer.appendChild(reportsText);
+    }
+}
 function updateSummary(summary) {
     let summaryBlock = document.getElementById(SUMMARYID);
     summaryBlock.firstChild.remove();
@@ -146,14 +134,36 @@ function updateSummary(summary) {
     } else {
         if (isNative){
             tierInfo = getTierInfo('native');
-            summaryBlock.appendChild(tierInfo);
-            tierTable.appendChild(tbody);
+            newTableRatingRow(tbody, 'Overall', tierInfo);
         } else {
             tierTable = document.createElement('span');
             rowTitle.innerText = 'Need reports to generate a score.';
         }
     }
     summaryBlock.appendChild(tierTable);
+    
+    if (!isNative){
+        let totalCount = document.createElement('div');
+        console.log('test')
+        totalCount.setAttribute('id', COUNTID);
+        let reportsText = document.createElement('span');
+        reportsText.innerText = 'Based on '+summary.total+' total reports.';
+        totalCount.appendChild(reportsText);
+        summaryBlock.appendChild(totalCount);
+    }
+}
+
+function makeLink(url, text){
+    let linkContainer = document.createElement('div');
+
+    let link = document.createElement('a');
+    link.setAttribute('class', 'linkbar');
+    link.href = url;
+    link.target = '_blank';
+    link.innerText = text;
+    linkContainer.appendChild(link);
+
+    return linkContainer;
 }
 
 function makeProtonInfoBlock() {
@@ -195,15 +205,18 @@ function makeProtonInfoBlock() {
     reportsBlock.id = REPORTSID;
     content.appendChild(reportsBlock);
 
-    let pdbLink = document.createElement('div');
-    content.appendChild(pdbLink);
+    let lineBreak = document.createElement('br');
+    content.appendChild(lineBreak);
 
-    let link = document.createElement('a');
-    link.setAttribute('class', 'linkbar');
-    link.href = 'https://www.protondb.com/app/'+appID;
-    link.target = '_blank';
-    link.innerText = 'See more details on ProtonDB.';
-    pdbLink.appendChild(link);
+    let url = 'https://www.protondb.com/app/'+appID;
+    let text = 'See more details on ProtonDB.';
+    let link = makeLink(url, text);
+    content.appendChild(link);
+
+    url = 'https://github.com/ValveSoftware/Proton#runtime-config-options';
+    text = 'More config information.';
+    link = makeLink(url, text);
+    content.appendChild(link);
 
     return element;
 }
