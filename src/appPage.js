@@ -208,14 +208,19 @@ function makeProtonInfoBlock() {
     return element;
 }
 
+function checkForLinux(){
+    let purcaseArea = document.getElementsByClassName('game_area_purchase_game_wrapper');
+    let icon = purcaseArea.getElementsByClassName('platform_img linux');
+    if (icon.length > 0){
+        isNative = true;
+    }
+}
+
 let appID = getSteamAppID();
 handleSummary(appID);
 handleReports(appID);
 
-let checkforLinux = document.getElementsByClassName('platform_img linux');
-if (checkforLinux.length > 0) {
-    isNative = true;
-}
+checkForLinux();
 
 let infoBlock = makeProtonInfoBlock();
 let container = document.querySelector('.game_meta_data');
