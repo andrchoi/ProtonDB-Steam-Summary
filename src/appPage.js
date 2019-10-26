@@ -100,47 +100,60 @@ function updateReports(reports) {
     }
 }
 
+function newTableRatingRow(tbody, desc, tier){
+    let row = document.createElement('tr');
+    tbody.appendChild(row);
+    
+    let rowTitle = document.createElement('td');
+    rowTitle.setAttribute('class', 'ellipsis')
+    rowTitle.style.textAlign = 'left';
+    rowTitle.innerText = desc+' Tier:';
+    row.appendChild(rowTitle);
+
+    let rowRating = document.createElement('td');
+    rowRating.setAttribute('class', 'checkcol');
+    rowRating.appendChild(tier);
+    row.appendChild(rowRating);
+}
+
 function updateSummary(summary) {
     let summaryBlock = document.getElementById(SUMMARYID);
     summaryBlock.firstChild.remove();
 
     let tierInfo;
     
-    let lineBreak = document.createElement('br');
-    let overallTier = document.createElement('b');
-    overallTier.innerText = 'Overall Tier: ';
-    summaryBlock.appendChild(overallTier);
+    let tierTable = document.createElement('table');
+    tierTable.setAttribute('class', 'game_language_options');
+    tierTable.style.borderCollapse = '';
+    tierTable.style.width = '75%';
+    let tbody = document.createElement('tbody');
 
     if (Object.keys(summary).length > 0) {
         if (summary.tier !== 'pending') {
             tierInfo = getTierInfo(summary.tier);
-            summaryBlock.appendChild(tierInfo);
-
-            summaryBlock.appendChild(lineBreak);
-
-            let recentTier = document.createElement('b');
-            recentTier.innerText = 'Trending Tier: ';
-            summaryBlock.appendChild(recentTier);
+            newTableRatingRow(tbody, 'Overall', tierInfo)
 
             tierInfo = getTierInfo(summary.trendingTier);
-            summaryBlock.appendChild(tierInfo);
-        } else {
-            overallTier.innerText = 'Provisional Tier: ';
+            newTableRatingRow(tbody, 'Trending', tierInfo)
 
+        } else {
             tierInfo = getTierInfo(summary.provisionalTier);
-            summaryBlock.appendChild(tierInfo);
+            newTableRatingRow(tbody, 'Provisional', tierInfo);
         }
+
+        tierTable.appendChild(tbody);
+
     } else {
         if (isNative){
             tierInfo = getTierInfo('native');
             summaryBlock.appendChild(tierInfo);
+            tierTable.appendChild(tbody);
         } else {
-            overallTier.innerText = 'Need reports to generate a score.';
+            tierTable = document.createElement('span');
+            rowTitle.innerText = 'Need reports to generate a score.';
         }
     }
-
-    lineBreak = document.createElement('br');
-    summaryBlock.appendChild(lineBreak);
+    summaryBlock.appendChild(tierTable);
 }
 
 function makeProtonInfoBlock() {
