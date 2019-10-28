@@ -1,10 +1,10 @@
 {
     "manifest_version": 2,
-    "name": "ProtonDB Ratings on Steam",
+    "name": "ProtonDB Steam Summary",
     "author": "choiandr",
     "version": "1.0",
   
-    "description": "Shows details from ProtonDB ratings on steam store pages.",
+    "description": "Shows ratings and suggested community fixes from ProtonDB reports on Steam store pages.",
 
     "icons": {
       "48": "icons/icon-48.png",
