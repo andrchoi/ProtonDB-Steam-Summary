@@ -63,6 +63,7 @@ function getTierInfo(tier) {
     textBlock.style.paddingRight = padding;
     if (tier){
         textBlock.style.color = 'black';
+        textBlock.style.fontWeight = 'bold';
     }
     return textBlock;
 }
