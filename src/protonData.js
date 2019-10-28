@@ -55,7 +55,7 @@ function getTierInfo(tier) {
     }
 
     let padding = '1em';
-    let textBlock = document.createElement('span');
+    let textBlock = document.createElement('div');
     textBlock.innerText = info.title;
     textBlock.setAttribute('title', info.description);
     textBlock.style.backgroundColor = info.color;

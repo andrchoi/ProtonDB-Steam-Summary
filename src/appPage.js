@@ -5,9 +5,6 @@ const REPORTSID = 'PDBRSAddon_reports';
 const COUNTID = 'PDBRSAddon_count';
 const METABLOCKID = 'PDBRSAddon_info';
 
-let summary;
-let reports;
-
 let isNative = false;
 
 
@@ -25,16 +22,12 @@ function handleSummary(appID) {
 
     let url = protonURL+protonAPI+appID+'.json';
     fetch(url).then(
-        res => res.json()).then(function(res) {
-            summary = res;
-        }
-    ).catch(function(error) {
-        console.log(error);
-        summary = {}
-    }).finally(function () {
-        console.log(summary);
-        updateSummary(summary);
-    })    
+        res => res.json()).then(updateSummary, function(error) {
+                console.log(error);
+                console.log(res);
+                updateSummary({});
+            }
+        )  
 }
 
 function handleReports(appID) {
@@ -42,15 +35,7 @@ function handleReports(appID) {
     let url = reportURL+appID+'/reports';
 
     fetch(url).then(
-        res => res.json()).then(function(res) {
-            reports = res;
-        }
-    ).catch(function (error) {
-        console.log(error);
-    }).finally(function () {
-        console.log(reports);
-        updateReports(reports);
-    })
+        res => res.json()).then(updateReports);
 }
 
 function updateReports(reports) {
@@ -98,7 +83,6 @@ function newTableRatingRow(tbody, desc, tier){
 function setReportsCount(count){
     let countContainer = document.getElementById(COUNTID)[0];
     let reportsText = document.createElement('span');
-    console.log('test')
     if (!isNative){
         reportsText.innerText = 'Based on '+count+' total reports.';
         countContainer.appendChild(reportsText);
@@ -116,35 +100,36 @@ function updateSummary(summary) {
     tierTable.style.width = '75%';
     let tbody = document.createElement('tbody');
 
-    if (Object.keys(summary).length > 0) {
-        if (summary.tier !== 'pending') {
-            tierInfo = getTierInfo(summary.tier);
-            newTableRatingRow(tbody, 'Overall', tierInfo)
-
-            tierInfo = getTierInfo(summary.trendingTier);
-            newTableRatingRow(tbody, 'Trending', tierInfo)
-
-        } else {
-            tierInfo = getTierInfo(summary.provisionalTier);
-            newTableRatingRow(tbody, 'Provisional', tierInfo);
+    if (isNative){
+        tierInfo = getTierInfo('native');
+        newTableRatingRow(tbody, 'Overall', tierInfo);
+    } 
+    else {
+        if (Object.keys(summary).length > 0) {
+            if (summary.tier !== 'pending') {
+                tierInfo = getTierInfo(summary.tier);
+                newTableRatingRow(tbody, 'Overall', tierInfo)
+    
+                tierInfo = getTierInfo(summary.trendingTier);
+                newTableRatingRow(tbody, 'Trending', tierInfo)
+    
+            } else {
+                tierInfo = getTierInfo(summary.provisionalTier);
+                newTableRatingRow(tbody, 'Provisional', tierInfo);
+            }
         }
-
-
-    } else {
-        if (isNative){
-            tierInfo = getTierInfo('native');
-        } else {
+        else {
             tierInfo = getTierInfo(false);
             summary.total = 0;
+            newTableRatingRow(tbody, 'Overall', tierInfo);
         }
-        newTableRatingRow(tbody, 'Overall', tierInfo);
     }
+
     tierTable.appendChild(tbody);
     summaryBlock.appendChild(tierTable);
     
     if (!isNative){
         let totalCount = document.createElement('div');
-        console.log('test')
         totalCount.setAttribute('id', COUNTID);
         let reportsText = document.createElement('span');
         reportsText.innerText = 'Based on '+summary.total+' total reports.';
