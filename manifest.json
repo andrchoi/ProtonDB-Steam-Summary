@@ -5,6 +5,11 @@
     "version": "1.0",
   
     "description": "Shows details from ProtonDB ratings on steam store pages.",
+
+    "icons": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    },
   
     "content_scripts": [
       {
