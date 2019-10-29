@@ -11,31 +11,39 @@ let isNative = false;
 function getSteamAppID() {
     let currentURL = window.location.href;
     let splitURL = currentURL.split('/');
-    let appID = splitURL[splitURL.indexOf('app')+1];
+    let appID = splitURL[splitURL.indexOf('app') + 1];
 
     return parseInt(appID);
 }
 
-function handleSummary(appID) {
+async function handleSummary(appID) {
     let protonURL = 'https://www.protondb.com/';
     let protonAPI = 'api/v1/reports/summaries/';
 
-    let url = protonURL+protonAPI+appID+'.json';
-    fetch(url).then(
-        res => res.json()).then(updateSummary, function(error) {
-                console.log(error);
-                console.log(res);
-                updateSummary({});
-            }
-        )  
+    let url = protonURL + protonAPI + appID + '.json';
+
+    try {
+        let res = await fetch(url);
+        let result = await res.json();
+        console.log(JSON.stringify(result));
+        updateSummary(result);
+    } catch(err) {
+        updateSummary({})
+    }
 }
 
-function handleReports(appID) {
+async function handleReports(appID) {
     let reportURL = 'https://protondb.max-p.me/games/';
-    let url = reportURL+appID+'/reports';
+    let url = reportURL + appID + '/reports';
 
-    fetch(url).then(
-        res => res.json()).then(updateReports);
+    try {
+        let res = await fetch(url);
+        let result = await res.json();
+        console.log(JSON.stringify(result));
+        updateReports(result);
+    } catch(err) {
+        console.log(err);
+    }
 }
 
 function updateReports(reports) {
@@ -51,12 +59,12 @@ function updateReports(reports) {
         let firstInList = true;
         fixes.forEach(function (fix) {
             let fixText = document.createElement('span');
-            if (!firstInList) {  
+            if (!firstInList) {
                 fixText.innerText = ', ';
             }
             firstInList = false;
             fixText.innerText += fix.name;
-            fixText.setAttribute('title', 'Mentioned in '+fix.count+' recent reports');
+            fixText.setAttribute('title', 'Mentioned in ' + fix.count + ' recent reports');
 
             fixesBlock.appendChild(fixText);
         })
@@ -64,14 +72,14 @@ function updateReports(reports) {
     }
 }
 
-function newTableRatingRow(tbody, desc, tier){
+function newTableRatingRow(tbody, desc, tier) {
     let row = document.createElement('tr');
     tbody.appendChild(row);
-    
+
     let rowTitle = document.createElement('td');
     rowTitle.setAttribute('class', 'ellipsis')
     rowTitle.style.textAlign = 'left';
-    rowTitle.innerText = desc+' Tier:';
+    rowTitle.innerText = desc + ' Tier:';
     row.appendChild(rowTitle);
 
     let rowRating = document.createElement('td');
@@ -80,11 +88,11 @@ function newTableRatingRow(tbody, desc, tier){
     row.appendChild(rowRating);
 }
 
-function setReportsCount(count){
+function setReportsCount(count) {
     let countContainer = document.getElementById(COUNTID)[0];
     let reportsText = document.createElement('span');
-    if (!isNative){
-        reportsText.innerText = 'Based on '+count+' total reports.';
+    if (!isNative) {
+        reportsText.innerText = 'Based on ' + count + ' total reports.';
         countContainer.appendChild(reportsText);
     }
 }
@@ -93,26 +101,26 @@ function updateSummary(summary) {
     summaryBlock.firstChild.remove();
 
     let tierInfo;
-    
+
     let tierTable = document.createElement('table');
     tierTable.setAttribute('class', 'game_language_options');
     tierTable.style.borderCollapse = 'initial';
     tierTable.style.width = '75%';
     let tbody = document.createElement('tbody');
 
-    if (isNative){
+    if (isNative) {
         tierInfo = getTierInfo('native');
         newTableRatingRow(tbody, 'Overall', tierInfo);
-    } 
+    }
     else {
         if (Object.keys(summary).length > 0) {
             if (summary.tier !== 'pending') {
                 tierInfo = getTierInfo(summary.tier);
                 newTableRatingRow(tbody, 'Overall', tierInfo)
-    
+
                 tierInfo = getTierInfo(summary.trendingTier);
                 newTableRatingRow(tbody, 'Trending', tierInfo)
-    
+
             } else {
                 tierInfo = getTierInfo(summary.provisionalTier);
                 newTableRatingRow(tbody, 'Provisional', tierInfo);
@@ -127,18 +135,18 @@ function updateSummary(summary) {
 
     tierTable.appendChild(tbody);
     summaryBlock.appendChild(tierTable);
-    
-    if (!isNative){
+
+    if (!isNative) {
         let totalCount = document.createElement('div');
         totalCount.setAttribute('id', COUNTID);
         let reportsText = document.createElement('span');
-        reportsText.innerText = 'Based on '+summary.total+' total reports.';
+        reportsText.innerText = 'Based on ' + summary.total + ' total reports.';
         totalCount.appendChild(reportsText);
         summaryBlock.appendChild(totalCount);
     }
 }
 
-function makeLink(url, text){
+function makeLink(url, text) {
     let linkContainer = document.createElement('div');
 
     let link = document.createElement('a');
@@ -155,12 +163,12 @@ function makeProtonInfoBlock() {
     let element = document.getElementsByClassName(METABLOCKID);
     if (element.length > 0) {
         element = element[0];
-        while(element.childElementCount > 0) {
+        while (element.childElementCount > 0) {
             element.firstChild.remove();
         }
     } else {
         element = document.createElement('div');
-        element.className = 'block responsive_apppage_details_right game_details '+METABLOCKID;
+        element.className = 'block responsive_apppage_details_right game_details ' + METABLOCKID;
     }
 
     let title = document.createElement('div');
@@ -193,7 +201,7 @@ function makeProtonInfoBlock() {
     let lineBreak = document.createElement('br');
     content.appendChild(lineBreak);
 
-    let url = 'https://www.protondb.com/app/'+appID;
+    let url = 'https://www.protondb.com/app/' + appID;
     let text = 'See more details on ProtonDB.';
     let link = makeLink(url, text);
     content.appendChild(link);
@@ -206,10 +214,10 @@ function makeProtonInfoBlock() {
     return element;
 }
 
-function checkForLinux(){
+function checkForLinux() {
     let purchaseArea = document.getElementById('game_area_purchase');
     let icon = purchaseArea.getElementsByClassName('platform_img linux');
-    if (icon.length > 0){
+    if (icon.length > 0) {
         isNative = true;
     }
 }
