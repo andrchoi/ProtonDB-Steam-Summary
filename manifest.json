@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "ProtonDB Steam Summary",
     "author": "choiandr",
-    "version": "1.0",
+    "version": "1.0.1",
   
     "description": "Shows ratings and suggested community fixes from ProtonDB reports on Steam store pages.",
 
